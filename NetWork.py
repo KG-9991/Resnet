@@ -100,7 +100,7 @@ class batch_norm_relu_layer(nn.Module):
         ### YOUR CODE HERE
     def forward(self, inputs: Tensor) -> Tensor:
         ### YOUR CODE HERE
-        
+        print("")
         ### YOUR CODE HERE
 
 class standard_block(nn.Module):
@@ -120,6 +120,7 @@ class standard_block(nn.Module):
         super(standard_block, self).__init__()
         ### YOUR CODE HERE
         if self.projection_shortcut is not None:
+            print("")
             
         ### YOUR CODE HERE
 
@@ -129,7 +130,7 @@ class standard_block(nn.Module):
 
     def forward(self, inputs: Tensor) -> Tensor:
         ### YOUR CODE HERE
-        
+        print("")
         ### YOUR CODE HERE
 
 class bottleneck_block(nn.Module):
@@ -159,6 +160,7 @@ class bottleneck_block(nn.Module):
         ### YOUR CODE HERE
         # The projection shortcut should come after the first batch norm and ReLU
 		# since it performs a 1x1 convolution.
+        print("")
 
         ### YOUR CODE HERE
 
@@ -186,7 +188,7 @@ class stack_layer(nn.Module):
     
     def forward(self, inputs: Tensor) -> Tensor:
         ### END CODE HERE
-        
+        print("")
         ### END CODE HERE
 
 class output_layer(nn.Module):
@@ -210,5 +212,5 @@ class output_layer(nn.Module):
     
     def forward(self, inputs: Tensor) -> Tensor:
         ### END CODE HERE
-        
+        print("")
         ### END CODE HERE
