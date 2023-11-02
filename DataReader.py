@@ -40,7 +40,7 @@ def load_data(data_dir):
     y_test = np.array(test_data[b'labels'])
 
     print("//////////////////")
-    print(x_train,x_test)
+    print(x_train.shape,x_test.shape,len(y_train),y_test.shape)
 
     return x_train, np.array(y_train), x_test, y_test
 
