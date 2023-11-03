@@ -39,9 +39,6 @@ def load_data(data_dir):
     x_test = np.array(test_data[b'data'])
     y_test = np.array(test_data[b'labels'])
 
-    print("//////////////////")
-    print(x_train.shape,x_test.shape,len(y_train),y_test.shape)
-
     return x_train, np.array(y_train), x_test, y_test
 
 def train_vaild_split(x_train, y_train, split_index=45000):
