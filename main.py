@@ -1,6 +1,7 @@
 from ImageUtils import parse_record
 from DataReader import load_data, train_vaild_split
 from Model import Cifar
+from torchsummary import summary
 
 import os
 import argparse
@@ -33,7 +34,7 @@ def main(config):
     x_train_new, y_train_new, x_valid, y_valid = train_vaild_split(x_train, y_train)
 
     model = Cifar(config).cuda()
-
+    summary(model,(3,32,32))
     ### YOUR CODE HERE
     # First step: use the train_new set and the valid set to choose hyperparameters.
     # model.train(x_train_new, y_train_new, 200)
@@ -49,6 +50,6 @@ def main(config):
     ### END CODE HERE
 
 if __name__ == "__main__":
-    os.environ['CUDA_VISIBLE_DEVICES'] = '9'
+    os.environ['CUDA_VISIBLE_DEVICES'] = '0'
     config = configure()
     main(config)

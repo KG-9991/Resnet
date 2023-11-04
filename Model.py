@@ -4,7 +4,7 @@ import torch
 import torch.nn as nn
 import numpy as np
 from tqdm import tqdm
-
+import torch.optim as optim
 from NetWork import ResNet
 from ImageUtils import parse_record
 
@@ -23,7 +23,8 @@ class Cifar(nn.Module):
         )
         ### YOUR CODE HERE
         # define cross entropy loss and optimizer
-
+        self.loss = nn.CrossEntropyLoss()
+        self.optimizer = optim.SGD(self.network.parameters(), lr = 0.1, momentum=0.9, weight_decay=self.config.weight_decay)
         ### YOUR CODE HERE
     
     def train(self, x_train, y_train, max_epoch):
@@ -31,7 +32,7 @@ class Cifar(nn.Module):
         # Determine how many batches in an epoch
         num_samples = x_train.shape[0]
         num_batches = num_samples // self.config.batch_size
-
+        learning_rate = 0.1
         print('### Training... ###')
         for epoch in range(1, max_epoch+1):
             start_time = time.time()
@@ -43,7 +44,8 @@ class Cifar(nn.Module):
             ### YOUR CODE HERE
             # Set the learning rate for this epoch
             # Usage example: divide the initial learning rate by 10 after several epochs
-            
+            if epoch % 40 == 0:
+                learning_rate = learning_rate / 10
             ### YOUR CODE HERE
             
             for i in range(num_batches):
@@ -51,7 +53,17 @@ class Cifar(nn.Module):
                 # Construct the current batch.
                 # Don't forget to use "parse_record" to perform data preprocessing.
                 # Don't forget L2 weight decay
-                
+                if i == num_batches - 1 and num_samples%num_batches != 0:
+                    x_train = curr_x_train[i*num_batches:]
+                    y_train = curr_y_train[i*num_batches:]
+                else:
+                    x_train = curr_x_train[i*(num_batches):(i+1)*(num_batches)]
+                    y_train = curr_y_train[i*(num_batches):(i+1)*(num_batches)]
+                x_train_pre = []
+                for j in range(x_train.shape[0]):
+                    x_train_pre.append(parse_record(x_train[j],True)) 
+                outputs = self.network(x_train_pre)
+                loss = self.loss(outputs,y_train)             
                 ### YOUR CODE HERE
                 self.optimizer.zero_grad()
                 loss.backward()
@@ -72,14 +84,20 @@ class Cifar(nn.Module):
         for checkpoint_num in checkpoint_num_list:
             checkpointfile = os.path.join(self.config.modeldir, 'model-%d.ckpt'%(checkpoint_num))
             self.load(checkpointfile)
-
+            ### YOUR CODE HERE
             preds = []
+            x_test_pre = []
+            for i in x:
+                x_test_pre.append(parse_record(x[i],False))
             for i in tqdm(range(x.shape[0])):
-                ### YOUR CODE HERE
-                
-                ### END CODE HERE
+                with torch.no_grad():
+                    outputs = self.network(x_test_pre[i])
+                _, predicted = torch.max(outputs, 1)
+                preds.append(predicted.item())
+            
+            ### END CODE HERE
 
-                y = torch.tensor(y)
+            y = torch.tensor(y)
             preds = torch.tensor(preds)
             print('Test accuracy: {:.4f}'.format(torch.sum(preds==y)/y.shape[0]))
     
