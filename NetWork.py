@@ -1,6 +1,8 @@
 import torch
 from torch.functional import Tensor
 import torch.nn as nn
+from torchsummary import summary
+
 
 """ This script defines the network.
 """
@@ -52,7 +54,7 @@ class ResNet(nn.Module):
 
         ### YOUR CODE HERE
         # define conv1
-        self.conv1 = nn.Conv2d(in_channels=3,out_channels=first_num_filters,kernel_size=3, stride=1, padding=1, bias=False)        
+        self.start_layer = nn.Conv2d(in_channels=3,out_channels=first_num_filters,kernel_size=3, stride=1, padding=1, bias=False)        
         ### YOUR CODE HERE
 
         # We do not include batch normalization or activation functions in V2
@@ -72,11 +74,15 @@ class ResNet(nn.Module):
 
         self.stack_layers = nn.ModuleList()
         for i in range(3):
-            filters = self.first_num_filters * (2**i)
+            if i == 0:
+                filters = self.first_num_filters    
+            else:
+                filters = self.first_num_filters * (2)
             strides = 1 if i == 0 else 2
             self.stack_layers.append(stack_layer(filters, block_fn, strides, self.resnet_size, self.first_num_filters))
             self.first_num_filters = filters
-        self.output_layer = output_layer(filters*4, self.resnet_version, self.num_classes)
+        filters_out = filters * 4 if block_fn is bottleneck_block else filters
+        self.output_layer = output_layer(filters_out, self.resnet_version, self.num_classes)
     
     def forward(self, inputs):
         outputs = self.start_layer(inputs)
@@ -122,17 +128,19 @@ class standard_block(nn.Module):
     """
     def __init__(self, filters, projection_shortcut, strides, first_num_filters) -> None:
         super(standard_block, self).__init__()
-        self.projection_shortcut = projection_shortcut
         ### YOUR CODE HERE
+        self.projection_shortcut = projection_shortcut
         self.conv1 = nn.Conv2d(in_channels=first_num_filters,out_channels=filters,kernel_size=3, stride=strides, padding=1, bias=False)
         self.bn_relu1 = batch_norm_relu_layer(num_features=filters, eps=1e-5, momentum=0.997)
-        self.conv2 = nn.Conv2d(in_channels=filters,out_channels=filters,kernel_size=3, stride=strides, padding=1, bias=False)
+        self.conv2 = nn.Conv2d(in_channels=filters,out_channels=filters,kernel_size=3, stride=1, padding=1, bias=False)
         self.bn2 = nn.BatchNorm2d(num_features=filters, eps=1e-5, momentum=0.997)
-        if self.projection_shortcut is not None:
+        if self.projection_shortcut is not None or strides != 1:
             self.projection_shortcut = nn.Sequential(nn.Conv2d(first_num_filters, filters,
                                                                kernel_size=1, stride=strides, bias=False), 
                                                     nn.BatchNorm2d(num_features=filters, eps=1e-5, 
                                                                               momentum=0.997))
+        else:
+            self.projection_shortcut = nn.Sequential()
         self.relu = nn.ReLU()
         ### YOUR CODE HERE
 
@@ -146,6 +154,13 @@ class standard_block(nn.Module):
         bn_relu1 = self.bn_relu1(cnv_ot1)
         cn2_ot2 =  self.conv2(bn_relu1)
         bn2 = self.bn2(cn2_ot2)
+        output = inputs
+        #print(bn2)
+        """print("---------")
+        for m in self.projection_shortcut.children():
+            output = m(output)
+            print(m,output.shape)"""
+
         bn2 += self.projection_shortcut(inputs)
         output = self.relu(bn2)
         return output
@@ -202,12 +217,12 @@ class stack_layer(nn.Module):
         # projection_shortcut = ?
         # Only the first block per stack_layer uses projection_shortcut and strides
         self.stack = nn.ModuleList()
-        if strides != 1:
-            self.stack.append(block_fn(filters_out,nn.Sequential(),strides,first_num_filters))
-        else:
-            self.stack.append(block_fn(filters_out,None,strides,first_num_filters))
-        for _ in range(resnet_size-1):
-            self.stack.append(block_fn(filters_out,None,strides,first_num_filters))
+        for i in range(resnet_size-1):
+            if (strides != 1) and (i==0):
+                self.stack.append(block_fn(filters_out,nn.Sequential(),strides,first_num_filters))
+            else:
+                self.stack.append(block_fn(filters_out,None,1,first_num_filters))
+            #self.stack.append(block_fn(filters_out,None,strides,first_num_filters))
             first_num_filters = filters_out
         ### END CODE HERE
     

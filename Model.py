@@ -44,8 +44,9 @@ class Cifar(nn.Module):
             ### YOUR CODE HERE
             # Set the learning rate for this epoch
             # Usage example: divide the initial learning rate by 10 after several epochs
-            if epoch % 40 == 0:
+            if epoch % 50 == 0:
                 learning_rate = learning_rate / 10
+                self.optimizer.param_groups[0]['lr'] = learning_rate
             ### YOUR CODE HERE
             
             for i in range(num_batches):
@@ -54,22 +55,23 @@ class Cifar(nn.Module):
                 # Don't forget to use "parse_record" to perform data preprocessing.
                 # Don't forget L2 weight decay
                 if i == num_batches - 1 and num_samples%num_batches != 0:
-                    x_train = curr_x_train[i*num_batches:]
-                    y_train = curr_y_train[i*num_batches:]
+                    x_train = curr_x_train[self.config.batch_size*num_batches:]
+                    y_train = curr_y_train[self.config.batch_size*num_batches:]
                 else:
-                    x_train = curr_x_train[i*(num_batches):(i+1)*(num_batches)]
-                    y_train = curr_y_train[i*(num_batches):(i+1)*(num_batches)]
+                    x_train = curr_x_train[i*(self.config.batch_size):(i+1)*(self.config.batch_size)]
+                    y_train = curr_y_train[i*(self.config.batch_size):(i+1)*(self.config.batch_size)]
                 x_train_pre = []
                 for j in range(x_train.shape[0]):
                     x_train_pre.append(parse_record(x_train[j],True)) 
+                x_train_pre = torch.tensor(x_train_pre, dtype=torch.float32)
                 outputs = self.network(x_train_pre)
-                loss = self.loss(outputs,y_train)             
+                loss = self.loss(outputs,torch.tensor(y_train))             
                 ### YOUR CODE HERE
                 self.optimizer.zero_grad()
                 loss.backward()
                 self.optimizer.step()
-
-                print('Batch {:d}/{:d} Loss {:.6f}'.format(i, num_batches, loss), end='\r', flush=True)
+                print("Batch {:d}/{:d} Loss {:.6f}".format(i, num_batches, loss.item()))
+                #print("Batch {:d}/{:d} Loss {:.6f}".format(i, num_batches, loss), end='\r', flush=True)
             
             duration = time.time() - start_time
             print('Epoch {:d} Loss {:.6f} Duration {:.3f} seconds.'.format(epoch, loss, duration))
@@ -87,11 +89,11 @@ class Cifar(nn.Module):
             ### YOUR CODE HERE
             preds = []
             x_test_pre = []
-            for i in x:
-                x_test_pre.append(parse_record(x[i],False))
+            """for i in x:
+                x_test_pre.append(parse_record(x[i],False))"""
             for i in tqdm(range(x.shape[0])):
                 with torch.no_grad():
-                    outputs = self.network(x_test_pre[i])
+                    outputs = self.network(x[i])
                 _, predicted = torch.max(outputs, 1)
                 preds.append(predicted.item())
             
@@ -111,3 +113,4 @@ class Cifar(nn.Module):
         ckpt = torch.load(checkpoint_name, map_location="cpu")
         self.network.load_state_dict(ckpt, strict=True)
         print("Restored model parameters from {}".format(checkpoint_name))
+
