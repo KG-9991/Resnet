@@ -40,7 +40,7 @@ class Cifar(nn.Module):
             shuffle_index = np.random.permutation(num_samples)
             curr_x_train = x_train[shuffle_index]
             curr_y_train = y_train[shuffle_index]
-
+            print("Shapeeeeee",x_train.shape)
             ### YOUR CODE HERE
             # Set the learning rate for this epoch
             # Usage example: divide the initial learning rate by 10 after several epochs
@@ -48,6 +48,7 @@ class Cifar(nn.Module):
                 learning_rate = learning_rate / 10
                 self.optimizer.param_groups[0]['lr'] = learning_rate
             ### YOUR CODE HERE
+            train_loss = 0
             
             for i in range(num_batches):
                 ### YOUR CODE HERE
@@ -55,26 +56,32 @@ class Cifar(nn.Module):
                 # Don't forget to use "parse_record" to perform data preprocessing.
                 # Don't forget L2 weight decay
                 if i == num_batches - 1 and num_samples%num_batches != 0:
-                    x_train = curr_x_train[self.config.batch_size*num_batches:]
-                    y_train = curr_y_train[self.config.batch_size*num_batches:]
+                    print("yes last batch")
+                    x_train_new = curr_x_train[self.config.batch_size*num_batches:]
+                    y_train_new = curr_y_train[self.config.batch_size*num_batches:]
+                    print("batch_shape",x_train_new.shape)
                 else:
-                    x_train = curr_x_train[i*(self.config.batch_size):(i+1)*(self.config.batch_size)]
-                    y_train = curr_y_train[i*(self.config.batch_size):(i+1)*(self.config.batch_size)]
+                    x_train_new = curr_x_train[i*(self.config.batch_size):(i+1)*(self.config.batch_size)]
+                    print("batch shape",x_train_new.shape,flush=True)
+                    y_train_new = curr_y_train[i*(self.config.batch_size):(i+1)*(self.config.batch_size)]
                 x_train_pre = []
-                for j in range(x_train.shape[0]):
-                    x_train_pre.append(parse_record(x_train[j],True)) 
+                for j in range(x_train_new.shape[0]):
+                    x_train_pre.append(parse_record(x_train_new[j],True)) 
                 x_train_pre = torch.tensor(x_train_pre, dtype=torch.float32)
+                print("Batch number:",i+1)
                 outputs = self.network(x_train_pre)
-                loss = self.loss(outputs,torch.tensor(y_train))             
+                loss = self.loss(outputs,torch.tensor(y_train_new))             
                 ### YOUR CODE HERE
                 self.optimizer.zero_grad()
                 loss.backward()
                 self.optimizer.step()
-                print("Batch {:d}/{:d} Loss {:.6f}".format(i, num_batches, loss.item()))
+                train_loss += loss.item() * self.config.batch_size
+                print("Batch {:d}/{:d} Loss {:.6f}".format(i, num_batches, loss.item()),flush=True)
                 #print("Batch {:d}/{:d} Loss {:.6f}".format(i, num_batches, loss), end='\r', flush=True)
-            
+            avrg_loss = train_loss/num_samples
+            print("Average training loss for the epoch",epoch,"is",avrg_loss)
             duration = time.time() - start_time
-            print('Epoch {:d} Loss {:.6f} Duration {:.3f} seconds.'.format(epoch, loss, duration))
+            print('Epoch {:d} Loss {:.6f} Duration {:.3f} seconds.'.format(epoch, loss, duration),flush=True)
 
             if epoch % self.config.save_interval == 0:
                 self.save(epoch)
@@ -88,7 +95,7 @@ class Cifar(nn.Module):
             self.load(checkpointfile)
             ### YOUR CODE HERE
             preds = []
-            x_test_pre = []
+            #x_test_pre = []
             """for i in x:
                 x_test_pre.append(parse_record(x[i],False))"""
             for i in tqdm(range(x.shape[0])):
