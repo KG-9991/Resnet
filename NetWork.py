@@ -234,38 +234,38 @@ class bottleneck_block(nn.Module):
         ### YOUR CODE HERE
         # The projection shortcut should come after the first batch norm and ReLU
 		# since it performs a 1x1 convolution.
-        print("input shape: ",inputs.shape)
+        """print("input shape: ",inputs.shape)
         print("********",self.upsample_input)
-        print("-------------",self.first_num_filters,self.filters)
+        print("-------------",self.first_num_filters,self.filters)"""
         if (self.upsample_input==True):
             bn_relu_ot1 = self.bn_relu1_stack1_input1(inputs)
         elif (self.first_layer == True):
             bn_relu_ot1 = self.bn_relu1_inputs1(inputs)
         else:
             bn_relu_ot1 = self.bn_relu1(inputs)
-        print("__bnrelu1__",bn_relu_ot1.size())
+        #print("__bnrelu1__",bn_relu_ot1.size())
         if (self.upsample_input==True):
             cnv_ot1 = self.conv1_stack1_input1(bn_relu_ot1) 
         elif self.first_layer == True:
             cnv_ot1 = self.conv1_input1(bn_relu_ot1)
         else:
             cnv_ot1 = self.conv1(bn_relu_ot1)
-        print("__cvn_ot1__",cnv_ot1.size())
+        #print("__cvn_ot1__",cnv_ot1.size())
         bn_relu_ot2 = self.bn_relu2(cnv_ot1)
-        print("__bnrelu2__",bn_relu_ot2.size())
+        #print("__bnrelu2__",bn_relu_ot2.size())
         cnv_ot2 = self.conv2(bn_relu_ot2)
-        print("__cvn_ot2__",cnv_ot2.size())
+        #print("__cvn_ot2__",cnv_ot2.size())
         bn_relu_ot3 = self.bn_relu3(cnv_ot2)
         #print("__bnrelu2__",bn_relu_ot3.size())
         cnv_ot3 = self.conv3(bn_relu_ot3)
-        print("conv333",cnv_ot3.size())
+        #print("conv333",cnv_ot3.size())
         #print("__cvn_ot2__",cnv_ot2.size())
         #print("Projectionssss",self.projection_shortcut(inputs).size())
         if (self.upsample_input == True):
             cnv_ot3 += self.projection_shortcut(inputs)
         else:
             cnv_ot3 += self.projection_shortcut(bn_relu_ot1)
-        print("enddddddd")
+        #print("enddddddd")
         return cnv_ot3
 
         ### YOUR CODE HERE
@@ -294,12 +294,12 @@ class stack_layer(nn.Module):
         self.start_layer_stack = True
         for i in range(resnet_size):
             if block_fn is bottleneck_block and self.start_layer==True:
-                print("Stack1_Layer1")
+                #print("Stack1_Layer1")
                 self.stack.append(bottleneck_block(filters_out,nn.Sequential(),strides,first_num_filters,self.start_layer))
                 self.start_layer = False
                 self.start_layer_stack = False
             elif block_fn is bottleneck_block and self.start_layer_stack == True:
-                print("Layer1")
+                #print("Layer1")
                 self.stack.append(bottleneck_block(filters_out,nn.Sequential(),strides,first_num_filters,self.start_layer,self.start_layer_stack))
                 self.start_layer_stack = False
             elif (strides != 1) and (i==0):
@@ -309,7 +309,7 @@ class stack_layer(nn.Module):
             #self.stack.append(block_fn(filters_out,None,strides,first_num_filters))
             if (block_fn is standard_block):
                 first_num_filters = filters_out
-            print("block number",i)
+            #print("block number",i)
 
         """if (block_fn is bottleneck_block):
             first_num_filters *= 2
@@ -346,10 +346,12 @@ class output_layer(nn.Module):
     def forward(self, inputs: Tensor) -> Tensor:
         ### END CODE HERE
         outputs = self.avg_pool(inputs)
-        print("output of average pooling",outputs.size())
-        outputs = torch.flatten(outputs,1)
-        print("flatten output:",outputs.size())
+        #print("output of average pooling",outputs.size())
+        #outputs = torch.flatten(outputs,1)
+        outputs = outputs.view(outputs.size(0),-1)
+        #print("flatten output:",outputs.size())
         outputs = self.fc(outputs)
-        print("final outputs",outputs.size())
+        #print(outputs)
+        #print("final outputs",outputs.size())
         return outputs
         ### END CODE HERE

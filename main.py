@@ -33,15 +33,18 @@ def main(config):
     x_train, y_train, x_test, y_test = load_data(data_dir)
     print("cifar_batch")
     x_train_new, y_train_new, x_valid, y_valid = train_vaild_split(x_train, y_train)
-
+    
     model = Cifar(config)
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     model.to(device)
     #summary(model, (3, 32, 32))
 
     ### YOUR CODE HERE
+    batch_sizes = [32,64,128,256,512,1024]
+    learning_rates = [0.2,0.1,0.01,0.001]
+    weight_decays = [0.1,0.01,0.001,0.0001,0.00001]
     # First step: use the train_new set and the valid set to choose hyperparameters.
-    model.train(x_train_new, y_train_new, 2)
+    model.train(x_train_new, y_train_new, 200)
     model.test_or_validate(x_valid, y_valid, [160, 170, 180, 190, 200])
 
     # Second step: with hyperparameters determined in the first run, re-train
