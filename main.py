@@ -27,16 +27,16 @@ def main(config):
     print("--- Preparing Data ---")
 
     ### YOUR CODE HERE
-    data_dir = "cifar-10-batches-py"
+    data_dir = "/gpfs/scratch/kgayadhankar/Resnet/cifar-10-batches-py"
     ### YOUR CODE HERE
 
     x_train, y_train, x_test, y_test = load_data(data_dir)
     print("cifar_batch")
     x_train_new, y_train_new, x_valid, y_valid = train_vaild_split(x_train, y_train)
     
-    model = Cifar(config)
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    model.to(device)
+    model = Cifar(config).cude()
+    """device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    model.to(device)"""
     #summary(model, (3, 32, 32))
 
     ### YOUR CODE HERE
