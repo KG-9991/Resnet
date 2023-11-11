@@ -42,10 +42,10 @@ def main(config):
     ### YOUR CODE HERE
     batch_sizes = [32,64,128,256,512,1024]
     learning_rates = [0.2,0.1,0.01,0.001]
-    weight_decays = [0.1,0.01,0.001,0.0001,0.00001]
+    weight_decays = [0.01,0.001,0.0001,0.00001]
     # First step: use the train_new set and the valid set to choose hyperparameters.
     #model.train(x_train_new, y_train_new, 200)
-    model.test_or_validate(x_valid, y_valid, [180, 190, 200])
+    model.test_or_validate(x_valid, y_valid, [160, 170])
 
     # Second step: with hyperparameters determined in the first run, re-train
     # your model on the original train set.
