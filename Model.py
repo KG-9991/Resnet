@@ -116,7 +116,7 @@ class Cifar(nn.Module):
                 preds.append(predicted.item())
             ### END CODE HERE
 
-            y = torch.tensor(y)
+            y = torch.tensor(y).unsqueeze(0)
             preds = torch.tensor(preds)
             print('Test accuracy: {:.4f}'.format(torch.sum(preds==y)/y.shape[0]))
     
