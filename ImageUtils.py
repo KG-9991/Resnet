@@ -14,7 +14,7 @@ def parse_record(record, training):
         image: An array of shape [3, 32, 32].
     """
     # Reshape from [depth * height * width] to [depth, height, width].
-    depth_major = record.reshape((-1, 3, 32, 32))
+    depth_major = record.reshape((3, 32, 32))
 
     # Convert from [depth, height, width] to [height, width, depth]
     image = np.transpose(depth_major, [1, 2, 0])
