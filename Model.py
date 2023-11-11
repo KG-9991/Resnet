@@ -118,6 +118,8 @@ class Cifar(nn.Module):
 
             y = torch.tensor(y).reshape(-1,1)
             preds = torch.tensor(preds).reshape(-1,1)
+            print(y.size())
+            print(preds.size())
             print('Test accuracy: {:.4f}'.format(torch.sum(preds==y)/y.shape[0]))
     
     def save(self, epoch):
