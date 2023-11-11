@@ -106,7 +106,6 @@ class Cifar(nn.Module):
             self.load(checkpointfile)
             ### YOUR CODE HERE
             preds = []
-            x_test_pre = []
             #x_test_pre = []
             x_test_pre = torch.tensor(x_test_pre, dtype=torch.float32)
             for i in tqdm(range(x_test_pre.shape[0])):
@@ -116,8 +115,8 @@ class Cifar(nn.Module):
                 preds.append(predicted.item())
             ### END CODE HERE
 
-            y = torch.tensor(y).reshape(-1,1)
-            preds = torch.tensor(preds).reshape(-1,1)
+            y = torch.tensor(y)
+            preds = torch.tensor(preds)
             print(y.size())
             print(preds.size())
             print('Test accuracy: {:.4f}'.format(torch.sum(preds==y)/y.shape[0]))
