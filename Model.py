@@ -96,7 +96,6 @@ class Cifar(nn.Module):
         x = torch.tensor(x, dtype=torch.float32)
         x = x"""
         # Now you can pass x_tensor to the network
-        print("aaaaa",x.size())
         print('### Test or Validation ###')
         for checkpoint_num in checkpoint_num_list:
             checkpointfile = os.path.join(self.config.modeldir, 'model-%d.ckpt'%(checkpoint_num))
