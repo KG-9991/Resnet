@@ -95,6 +95,7 @@ class Cifar(nn.Module):
         """x = x.reshape(-1, 3, 32, 32)
         x = torch.tensor(x, dtype=torch.float32)
         x = x"""
+        x_test_pre =[]
         for i in x:
                 x_test_pre.append(parse_record(i,False))
         x_test_pre = torch.tensor(x_test_pre, dtype=torch.float32)
