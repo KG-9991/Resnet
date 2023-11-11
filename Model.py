@@ -114,13 +114,10 @@ class Cifar(nn.Module):
                     outputs = self.network(x_test_pre[i].unsqueeze(0))
                 _, predicted = torch.max(outputs, 1)
                 preds.append(predicted.item())
-            print("predsss:",preds)
             ### END CODE HERE
 
             y = torch.tensor(y)
-            y = y
             preds = torch.tensor(preds)
-            preds = preds
             print('Test accuracy: {:.4f}'.format(torch.sum(preds==y)/y.shape[0]))
     
     def save(self, epoch):
