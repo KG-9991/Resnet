@@ -45,7 +45,7 @@ def main(config):
     weight_decays = [0.01,0.001,0.0001,0.00001]
     # First step: use the train_new set and the valid set to choose hyperparameters.
     #model.train(x_train_new, y_train_new, 200)
-    #model.test_or_validate(x_valid, y_valid, [160, 170])
+    model.test_or_validate(x_valid, y_valid, [160,170,180,190,200])
 
     # Second step: with hyperparameters determined in the first run, re-train
     # your model on the original train set.
@@ -53,7 +53,7 @@ def main(config):
 
     # Third step: after re-training, test your model on the test set.
     # Report testing accuracy in your hard-copy report.
-    model.test_or_validate(x_test, y_test,[160])
+    #model.test_or_validate(x_test, y_test,[160])
     ### END CODE HERE
 
 if __name__ == "__main__":
