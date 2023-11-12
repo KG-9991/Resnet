@@ -126,7 +126,7 @@ class Cifar(nn.Module):
             ### YOUR CODE HERE
             preds = []
             #x_test_pre = []
-            x_test_pre = torch.tensor(x_test_pre, dtype=torch.float32)
+            #x_test_pre = torch.tensor(x_test_pre, dtype=torch.float32)
             for i in tqdm(range(x_test_pre.shape[0])):
                 with torch.no_grad():
                     outputs = self.network(x_test_pre[i].unsqueeze(0))
