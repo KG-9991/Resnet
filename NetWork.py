@@ -219,7 +219,7 @@ class bottleneck_block(nn.Module):
         self.conv2 = nn.Conv2d(in_channels=first_num_filters,out_channels=first_num_filters,kernel_size=3, stride=1, padding=1, bias=False)
         self.bn_relu3 = batch_norm_relu_layer(num_features=first_num_filters, eps=1e-5, momentum=0.997)
         self.conv3 = nn.Conv2d(in_channels=first_num_filters,out_channels=filters,kernel_size=1, stride=1, padding=0, bias=False)
-
+        self.dropout = nn.Dropout(p=0.2)
 
 
 
@@ -257,6 +257,7 @@ class bottleneck_block(nn.Module):
         #print("__cvn_ot2__",cnv_ot2.size())
         bn_relu_ot3 = self.bn_relu3(cnv_ot2)
         #print("__bnrelu2__",bn_relu_ot3.size())
+        bn_relu_ot3 = self.dropout(bn_relu_ot3)
         cnv_ot3 = self.conv3(bn_relu_ot3)
         #print("conv333",cnv_ot3.size())
         #print("__cvn_ot2__",cnv_ot2.size())
@@ -341,10 +342,12 @@ class output_layer(nn.Module):
         ### END CODE HERE
         self.avg_pool = nn.AdaptiveAvgPool2d((1,1))
         self.fc = nn.Linear(filters, num_classes)
+        self.dropout = nn.Dropout(p=0.2)
         ### END CODE HERE
     
     def forward(self, inputs: Tensor) -> Tensor:
         ### END CODE HERE
+        outputs = self.dropout(inputs)
         outputs = self.avg_pool(inputs)
         #print("output of average pooling",outputs.size())
         #outputs = torch.flatten(outputs,1)
