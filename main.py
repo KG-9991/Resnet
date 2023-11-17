@@ -35,9 +35,9 @@ def main(config):
     x_train_new, y_train_new, x_valid, y_valid = train_vaild_split(x_train, y_train)
     config.batch_size = 128
     config.weight_decay = 0.0002
-    model = Cifar(config).cuda()
-    """device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    model.to(device)"""
+    model = Cifar(config)
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    model.to(device)
     #summary(model, (3, 32, 32))
 
     ### YOUR CODE HERE
