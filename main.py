@@ -33,7 +33,7 @@ def main(config):
     x_train, y_train, x_test, y_test = load_data(data_dir)
     print("cifar_batch")
     x_train_new, y_train_new, x_valid, y_valid = train_vaild_split(x_train, y_train)
-    config.batch_size = x_train.shape[0]
+    config.batch_size = 128
     print("batch:::",config.batch_size)
     config.weight_decay = 0.0002
     model = Cifar(config).cuda()
