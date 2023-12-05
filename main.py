@@ -11,7 +11,7 @@ def configure():
     parser = argparse.ArgumentParser()
     ### YOUR CODE HERE
     parser.add_argument("--resnet_version", type=int, default=2, help="the version of ResNet")
-    parser.add_argument("--resnet_size", type=int, default=18, 
+    parser.add_argument("--resnet_size", type=int, default=3, 
                         help='n: the size of ResNet-(6n+2) v1 or ResNet-(9n+2) v2')
     parser.add_argument("--batch_size", type=int, default=128, help='training batch size')
     parser.add_argument("--num_classes", type=int, default=10, help='number of classes')
@@ -27,13 +27,14 @@ def main(config):
     print("--- Preparing Data ---")
 
     ### YOUR CODE HERE
-    data_dir = "/gpfs/scratch/kgayadhankar/Resnet/cifar-10-batches-py"
+    data_dir = "./cifar-10-batches-py"
     ### YOUR CODE HERE
 
     x_train, y_train, x_test, y_test = load_data(data_dir)
     print("cifar_batch")
     x_train_new, y_train_new, x_valid, y_valid = train_vaild_split(x_train, y_train)
-    config.batch_size = 128
+    config.batch_size = x_train.shape[0]
+    print("batch:::",config.batch_size)
     config.weight_decay = 0.0002
     model = Cifar(config).cuda()
     """device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
